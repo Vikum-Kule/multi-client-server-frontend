@@ -1,5 +1,6 @@
-import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid, IconButton, InputBase, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material'
-import React, {useState} from 'react'
+import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid, IconButton, InputBase, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, Stack, TextField, Tooltip, Typography, Alert } from '@mui/material'
+import React, {useState, useEffect} from 'react';
+import { useHistory } from 'react-router';
 import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
@@ -43,7 +44,19 @@ const useStyles = makeStyles({
 })
 
 function SearchPatient() {
-    
+    const history = useHistory();
+
+     useEffect(()=>{
+        const isLogged = localStorage.getItem("userId");
+        console.log(isLogged);
+        if(isLogged==null){
+            console.log("done");
+            history.push("/");
+        }else{
+            console.log("not done");
+        } 
+    });
+
     
     const classes = useStyles()
 
@@ -76,6 +89,7 @@ function SearchPatient() {
     const [patients, setPatients] = useState([]);
     const [records, setRecords] = useState([]);
     const [open, setOpen] = React.useState(false);
+    const [showErrAlart, setErrAlart]= useState(false);
 
   const handleClickOpen = () => {
     setErrors([]);
@@ -158,6 +172,7 @@ function SearchPatient() {
             getRecords(patient.id);
             handleClose();
         }).catch(error=>{
+            setErrAlart(true);
             console.log("error...", error);
             // if(error.response.status === 401 || error.response.status === 400 ){
             //     setShowError("Number is does not exist");
@@ -197,6 +212,12 @@ function SearchPatient() {
                     helperText={errors.record}
                     error={errors.record}
                 />
+                {showErrAlart?
+                            <Grid item xs={12}>
+                            <Alert onClose={() => {setErrAlart(false)}} severity="error">Something went wrong..Try again later!</Alert>
+                            </Grid>: null
+                }
+
                 </DialogContent>
                 <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>

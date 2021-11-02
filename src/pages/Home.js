@@ -12,7 +12,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import { Button, collapseClasses } from '@mui/material';
+import { Button, collapseClasses, Grid } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useHistory } from 'react-router';
 
@@ -45,6 +45,12 @@ export default function Home({children}) {
       setSelectedIndex(index)
     }
 
+    const hndleLogout =(event)=>{
+      localStorage.clear(); //for localStorage
+      sessionStorage.clear(); 
+      history.push("/");
+    }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -52,9 +58,16 @@ export default function Home({children}) {
         style={{backgroundColor:"#ffffff"}}
       >
         <Toolbar>
-          <Typography  className={classes.title} variant="h6" noWrap component="div">
-            Home
-          </Typography>
+          <Grid container>
+            <Grid item xs={11}>
+              <Typography  className={classes.title} variant="h6" noWrap component="div">
+                Home
+              </Typography>
+            </Grid>
+            <Grid item xs={1}>
+              <Button onClick={hndleLogout} variant="text">Logout</Button>
+            </Grid>
+          </Grid>
         </Toolbar>       
       </AppBar>
       <Drawer

@@ -1,12 +1,14 @@
 import React ,{useState}from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Paper, Avatar, TextField, Button, Stack, Typography, Link } from '@mui/material';
+import { Grid, Paper, Avatar, TextField, Button, Stack, Typography, Link, CircularProgress } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import LockIcon from '@mui/icons-material/Lock';
 import { pink } from '@mui/material/colors';
 import Validation from './Validation';
 import {userLogin} from '../services/Auth';
 import axios from 'axios';
+import { Box } from '@mui/system';
+import { useHistory } from 'react-router';
 // import { Link } from 'react-router-dom';
 
 
@@ -33,6 +35,8 @@ const useStyles = makeStyles({
 })
 
 function Signup(props) {
+    const history = useHistory();
+    const [loading, setLoading] = React.useState(false);
 
     const [showError, setShowError] = useState("");
 
@@ -60,12 +64,17 @@ function Signup(props) {
                 "username": username,
                 "password":password
             }).then(response=>{
+                setLoading(false);
                 console.log("Response..:", response);
-                props.history.push("/home/searchpatient");
+                const user = response.data.split('/');
+                console.log(user[1]);
+                localStorage.setItem('userId', user[1]);
+                history.push("/home/searchpatient");
             }).catch(error=>{
-                // console.log("error...", error.response.status);
+                setLoading(false);
+                // 
                 if(error.response.status === 401 || error.response.status === 400 ){
-                    setShowError("Invalid Credentials");
+                    setShowError("Previously Logged");
                 }
                 else{
                     setShowError("Something went wrong...try again later");
@@ -76,7 +85,8 @@ function Signup(props) {
     const hanldeFormSubmit = async(event)=>{
         event.preventDefault();
         setErrors(Validation(values));
-        if(!errors){ 
+        if(values.fullname && values.password && values.username){ 
+            setLoading(true);
             handSignup(values.fullname,values.username,values.password);
         }
     }
@@ -169,14 +179,28 @@ function Signup(props) {
                         />
                     </Grid>
                 </Grid>
-                <Button 
-                className={classes.btnSignin}
-                variant="contained"
-                fullWidth
-                onClick={hanldeFormSubmit}
-                >
-                    Sign up
-                </Button>
+                <Box sx={{ m: 1, position: 'relative' }}>
+                    <Button 
+                    className={classes.btnSignin}
+                    variant="contained"
+                    fullWidth
+                    onClick={hanldeFormSubmit}
+                    disabled={loading}
+                    >
+                        Sign up
+                    </Button>
+                    {loading && (
+                    <CircularProgress
+                        size={24}
+                        sx={{
+                        color: "green[500]",
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        marginTop: '-12px',
+                        marginLeft: '-12px',
+                        }}/>)}
+                </Box>
                 
             </Stack>
             <Typography align="center" sx={{ m: 2 }} className={classes.forgotpss}>
